@@ -9,7 +9,62 @@ MoviePy documentation
     :align: center
 
 **Date**: |today| **Version**: |version|
+from moviepy.editor import *
+from moviepy.video.tools.credits import credits1
 
+# Durasi tiap bagian lirik (dalam detik)
+durations = {
+    "intro": 8,
+    "verse1": 16,
+    "verse2": 16,
+    "chorus": 16,
+    "verse3": 16,
+    "bridge": 12,
+    "chorus2": 16,
+    "outro": 16,
+    "ending": 12
+}
+
+# Gabungkan semua teks lirik dengan format yang diinginkan
+lyrics = [
+    ("[Intro]", durations["intro"]),
+    ("Otak dan pikiran, sumber aliran\nTempat oksigen hidup dan berjalan\nSaat keras hati, napas pun terkunci\nJiwa tercekik oleh ego sendiri", durations["verse1"]),
+    ("Banyak yang bicara hal esensial\nTapi tak kenal inti yang paling hakiki\nBagaimana bisa berpikir mendalam\nJika belum menyentuh esensi diri?", durations["verse2"]),
+    ("Baligh bukan soal usia\nTapi ruh yang pulang pada cahaya\nKapitalisme dewasa luar\nTapi nuraninya belum mekar", durations["chorus"]),
+    ("Mental terbentuk dari pikiran dan hati\nAkal yang jernih, rasa yang suci\nTapi manusia sering lupa nalurinya\nKarena nafsu dan akalnya bersekutu di dunia", durations["verse3"]),
+    ("Hewan makan saat lapar\nManusia makan karena lapar mata\nYang satu tunduk pada alam\nYang lain dikendalikan gengsi dan kata", durations["bridge"]),
+    ("Baligh bukan soal sistem\nTapi jiwa yang tahu arah dan ritme\nYang tak hanya tumbuh ke luar\nTapi bertumbuh ke dalam, jadi sadar", durations["chorus2"]),
+    ("Jika kau ingin tahu arti cukup\nLihatlah hewan, bukan manusia yang rakus\nJika kau ingin hidup penuh makna\nKenali esensi, bukan hanya logika", durations["outro"]),
+    ("Hidup ini bukan soal seberapa banyak kita miliki,\nTapi seberapa dalam kita mengerti.\nBukan tentang seberapa tinggi kita berdiri,\nTapi seberapa rendah hati saat kembali.\nJadilah jiwa yang benar-benar baligh —\nBukan hanya dewasa secara usia,\nTapi sadar akan makna, arah, dan cahaya.", durations["ending"])
+]
+
+# Total durasi video
+total_duration = sum(d for _, d in lyrics)
+
+# Buat background clip dengan gambar
+background = ImageClip("background.jpg").set_duration(total_duration).resize(height=720)
+
+# Fungsi untuk membuat clip teks dengan durasi tertentu
+def make_text_clip(text, duration):
+    return (TextClip(text, fontsize=40, font='Arial', color='white', size=background.size, method='caption', align='center')
+            .set_duration(duration)
+            .set_position('center'))
+
+# Buat daftar klip teks berdasarkan lirik dan durasi
+text_clips = [make_text_clip(text, dur) for text, dur in lyrics]
+
+# Tempatkan klip teks secara berurutan (concatenate dengan crossfade)
+video = concatenate_videoclips(text_clips, method="compose")
+
+# Overlay teks pada background (bisa juga digabungkan dengan CompositeVideoClip)
+final_video = CompositeVideoClip([background, video.set_position("center")])
+
+# Tambahkan background musik
+audio_background = AudioFileClip("acoustic_background.mp3").subclip(0, total_duration)
+final_video = final_video.set_audio(audio_background)
+
+# Render video akhir
+final_video.write_videofile("balighnya_jiwa.mp4", fps=24)
 **Useful links**:
 `Binary Installers <https://pypi.org/project/moviepy/>`__ |
 `Source Repository <https://github.com/Zulko/moviepy>`__ |
@@ -138,4 +193,4 @@ MoviePy is an open source software originally written by Zulko_ and released und
 .. _Zulko: https://github.com/Zulko/
 .. _Stackoverflow: https://stackoverflow.com/
 .. _Github: https://github.com/Zulko/moviepy
-.. _Reddit: https://www.reddit.com/r/moviepy/
+.. _Reddit: https://www.reddit.com/r/moviepy
